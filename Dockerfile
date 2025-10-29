@@ -30,13 +30,13 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --optimize-autoloader
 
 # Copy package files for Node.js build
-COPY package.json package-lock.json ./
-
-# Install Node.js dependencies and build assets
-RUN npm ci && npm run build
+COPY package.json package-lock.json vite.config.js ./
 
 # Copy the rest of the application (artisan, bootstrap, resources, etc.)
 COPY . .
+
+# Install Node.js dependencies and build assets (now vite.config.js + resources exist)
+RUN npm ci && npm run build
 
 # Now run Composer scripts (artisan exists now)
 RUN composer run-script post-install-cmd || true
