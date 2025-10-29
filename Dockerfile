@@ -59,31 +59,26 @@ RUN npm run build
 RUN composer install --no-dev --optimize-autoloader
 
 # -------------------------------
-# 9. Optimize Laravel for production
-# -------------------------------
-RUN php artisan optimize
-
-# -------------------------------
-# 10. Point Apache to Laravel public dir
+# 9. Point Apache to Laravel public dir
 # -------------------------------
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf
 
 # -------------------------------
-# 11. Change Apache port for Render
+# 10. Change Apache port for Render
 # -------------------------------
 RUN sed -i 's/80/10000/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
 
 # -------------------------------
-# 12. Fix permissions
+# 11. Fix permissions
 # -------------------------------
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 # -------------------------------
-# 13. Expose Render’s port
+# 12. Expose Render’s port
 # -------------------------------
 EXPOSE 10000
 
 # -------------------------------
-# 14. Start Apache
+# 13. Start Apache
 # -------------------------------
 CMD ["apache2-foreground"]
