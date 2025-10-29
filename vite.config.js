@@ -8,4 +8,13 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        hmr: {
+            host: 'localhost',
+        },
+    },
+    build: {
+        // Ensure assets are built with correct URLs
+        assetsDir: 'assets',
+    },
 });
