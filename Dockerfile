@@ -1,7 +1,9 @@
 # Use official PHP 8.2 Apache image
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions required for Laravel + PostgreSQL + Node.js
+# -------------------------------
+# 1. Install system dependencies
+# -------------------------------
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
@@ -17,44 +19,71 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache mod_rewrite for Laravel routing
 RUN a2enmod rewrite
 
-# Set working directory to /var/www (Laravel app root)
+# -------------------------------
+# 2. Set working directory
+# -------------------------------
 WORKDIR /var/www
 
-# Install Composer (use latest version)
+# -------------------------------
+# 3. Install Composer
+# -------------------------------
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy composer files first for caching
+# -------------------------------
+# 4. Copy Composer files first (for cache)
+# -------------------------------
 COPY composer.json composer.lock ./
 
-# Install PHP dependencies without running scripts yet
+# Install PHP dependencies (no scripts yet)
 RUN composer install --no-dev --no-scripts --optimize-autoloader
 
-# Copy package files for Node.js build
+# -------------------------------
+# 5. Copy Node.js package files and install deps
+# -------------------------------
 COPY package.json package-lock.json vite.config.js ./
-
-# Install Node.js dependencies (package files only)
 RUN npm ci
 
-# Copy the rest of the application (artisan, bootstrap, resources, etc.)
+# -------------------------------
+# 6. Copy the rest of the application
+# -------------------------------
 COPY . .
 
-# Build frontend assets AFTER all resources are present
+# -------------------------------
+# 7. Build frontend assets with Vite
+# -------------------------------
 RUN npm run build
 
-# Now run Composer scripts (artisan exists now)
+# -------------------------------
+# 8. Re-run Composer (now artisan exists)
+# -------------------------------
 RUN composer install --no-dev --optimize-autoloader
 
-# Point Apache DocumentRoot to Laravel's public directory
+# -------------------------------
+# 9. Optimize Laravel for production
+# -------------------------------
+RUN php artisan optimize
+
+# -------------------------------
+# 10. Point Apache to Laravel public dir
+# -------------------------------
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Change Apache to listen on Render's required port (10000)
+# -------------------------------
+# 11. Change Apache port for Render
+# -------------------------------
 RUN sed -i 's/80/10000/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
 
-# Set correct permissions for Laravel storage and cache directories
+# -------------------------------
+# 12. Fix permissions
+# -------------------------------
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Expose port 10000 for Render
+# -------------------------------
+# 13. Expose Render’s port
+# -------------------------------
 EXPOSE 10000
 
-# Start Apache service
+# -------------------------------
+# 14. Start Apache
+# -------------------------------
 CMD ["apache2-foreground"]
