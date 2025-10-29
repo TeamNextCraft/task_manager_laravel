@@ -1,5 +1,41 @@
-vendor
+# Ignore Git
+.git
+.gitignore
+
+# Node / frontend build artifacts
 node_modules
 npm-debug.log
 yarn-error.log
+pnpm-debug.log
+
+# Laravel vendor (will be installed inside container)
+vendor
+
+# Environment files (use Render’s Environment Variables instead)
 .env
+.env.*
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+
+# Build outputs
+/public/hot
+/public/storage
+/storage/*.key
+
+# Cache and logs
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# Composer cache
+/.composer
+
+# Other
+.idea
+.vscode

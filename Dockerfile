@@ -17,23 +17,26 @@ WORKDIR /var/www
 # Install Composer (use latest version)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy composer.json and composer.lock first to leverage Docker's cache
-COPY composer.json composer.lock ./
+# Copy composer files + artisan first so post-install scripts can run
+COPY composer.json composer.lock artisan ./
 
 # Install PHP dependencies, optimize autoloader, no dev packages
 RUN composer install --no-dev --optimize-autoloader
 
-# Copy application files (excluding those in .dockerignore)
+# Copy the rest of the application files
 COPY . .
 
-# Point Apache DocumentRoot to Laravel's public directory for safer serving
+# Point Apache DocumentRoot to Laravel's public directory
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf
+
+# Change Apache to listen on Render's required port (10000)
+RUN sed -i 's/80/10000/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
 
 # Set correct permissions for Laravel storage and cache directories
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Expose port 80 for web traffic
-EXPOSE 80
+# Expose port 10000 for Render
+EXPOSE 10000
 
 # Start Apache service
 CMD ["apache2-foreground"]
