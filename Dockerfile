@@ -32,14 +32,17 @@ RUN composer install --no-dev --no-scripts --optimize-autoloader
 # Copy package files for Node.js build
 COPY package.json package-lock.json vite.config.js ./
 
+# Install Node.js dependencies (package files only)
+RUN npm ci
+
 # Copy the rest of the application (artisan, bootstrap, resources, etc.)
 COPY . .
 
-# Install Node.js dependencies and build assets (now vite.config.js + resources exist)
-RUN npm ci && npm run build
+# Build frontend assets AFTER all resources are present
+RUN npm run build
 
 # Now run Composer scripts (artisan exists now)
-RUN composer run-script post-install-cmd || true
+RUN composer install --no-dev --optimize-autoloader
 
 # Point Apache DocumentRoot to Laravel's public directory
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf
