@@ -17,14 +17,11 @@ WORKDIR /var/www
 # Install Composer (use latest version)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy composer files + artisan first so post-install scripts can run
-COPY composer.json composer.lock artisan bootstrap/ ./
+# Copy the application files
+COPY . .
 
 # Install PHP dependencies, optimize autoloader, no dev packages
 RUN composer install --no-dev --optimize-autoloader
-
-# Copy the rest of the application files
-COPY . .
 
 # Point Apache DocumentRoot to Laravel's public directory
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf
