@@ -1,12 +1,18 @@
 # Use official PHP 8.2 Apache image
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions required for Laravel + PostgreSQL
+# Install system dependencies and PHP extensions required for Laravel + PostgreSQL + Node.js
 RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
     libpq-dev \
     libzip-dev \
     unzip \
-    && docker-php-ext-install pdo pdo_pgsql zip
+    && docker-php-ext-install pdo pdo_pgsql zip \
+    # Install Node.js 20.x (for Vite build)
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm@latest
 
 # Enable Apache mod_rewrite for Laravel routing
 RUN a2enmod rewrite
@@ -17,11 +23,23 @@ WORKDIR /var/www
 # Install Composer (use latest version)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy the application files
+# Copy composer files first for caching
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies without running scripts yet
+RUN composer install --no-dev --no-scripts --optimize-autoloader
+
+# Copy package files for Node.js build
+COPY package.json package-lock.json ./
+
+# Install Node.js dependencies and build assets
+RUN npm ci && npm run build
+
+# Copy the rest of the application (artisan, bootstrap, resources, etc.)
 COPY . .
 
-# Install PHP dependencies, optimize autoloader, no dev packages
-RUN composer install --no-dev --optimize-autoloader
+# Now run Composer scripts (artisan exists now)
+RUN composer run-script post-install-cmd || true
 
 # Point Apache DocumentRoot to Laravel's public directory
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf

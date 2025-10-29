@@ -21,12 +21,4 @@ Route::middleware('auth')->group(function () {
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
 });
 
-// Temporary route to run migrations
-use Illuminate\Support\Facades\Artisan;
-
-Route::get('/run-migrations', function () {
-    Artisan::call('migrate', ['--force' => true]);
-    return 'Migrations run!';
-});
-
 require __DIR__.'/auth.php';
