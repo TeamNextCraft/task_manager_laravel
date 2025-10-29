@@ -18,7 +18,7 @@ WORKDIR /var/www
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy composer files + artisan first so post-install scripts can run
-COPY composer.json composer.lock artisan ./
+COPY composer.json composer.lock artisan bootstrap/ ./
 
 # Install PHP dependencies, optimize autoloader, no dev packages
 RUN composer install --no-dev --optimize-autoloader
