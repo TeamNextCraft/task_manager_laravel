@@ -2,7 +2,7 @@
     <div class="space-y-4">
         @foreach ($tasks as $task)
             <div class="task-item border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 {{ $task->completed ? 'completed bg-green-50 border-green-200' : 'bg-white' }}" data-task-id="{{ $task->id }}">
-                <div class="flex justify-between items-start">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-start">
                     <div class="flex items-start space-x-3 flex-1">
                         <!-- Completion Toggle -->
                         <form action="{{ route('tasks.toggle', $task->id) }}" method="POST" class="mt-1">

@@ -2,8 +2,8 @@
     <section class="py-12 bg-gradient-to-br from-blue-50 to-indigo-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Hero Section -->
-            <div class="text-center mb-16">
-                <h1 class="text-5xl font-bold text-gray-900 mb-6">
+            <div class="text-center mb-16 w-full">
+                <h1 class="text-3xl lg:text-5xl font-bold text-gray-900 mb-6 text-wrap">
                     Streamline Your
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
                         Task Management

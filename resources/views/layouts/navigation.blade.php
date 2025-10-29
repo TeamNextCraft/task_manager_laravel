@@ -1,4 +1,4 @@
-<nav class="bg-gradient-to-r from-indigo-600 to-teal-700 shadow-xl">
+<nav x-data="{ open: false }" class="bg-gradient-to-r from-indigo-600 to-teal-700 shadow-xl">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -147,7 +147,7 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }"
-        class="hidden sm:hidden bg-gradient-to-b from-indigo-700 to-teal-800 shadow-2xl">
+        class="hidden sm:hidden bg-gradient-to-b from-indigo-700 to-teal-800 shadow-2xl max-w-full">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
                 class="flex items-center px-4 py-4 border-l-4 border-indigo-400 hover:bg-white/10 transition-all duration-300 mx-3 rounded-xl">
@@ -202,7 +202,7 @@
 
             <div class="mt-2 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')"
-                    class="flex items-center px-4 py-3 hover:bg-white/10 transition-colors duration-200 rounded-lg mx-1">
+                    class="flex items-center px-4 py-3 text-rose-200 hover:text-white hover:bg-white/10 transition-colors duration-200 rounded-lg mx-1">
                     <svg class="w-5 h-5 mr-3 text-indigo-300" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

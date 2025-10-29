@@ -130,17 +130,6 @@
                     </div>
                 </div>
             </footer>
-
-            <!-- Quick Action Button (Optional - can be used for creating tasks) -->
-            @if (isset($showQuickAction) && $showQuickAction)
-                <div class="floating-action">
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                    </button>
-                </div>
-            @endif
         </div>
 
         <!-- Simplified JavaScript - Only essential interactions -->
