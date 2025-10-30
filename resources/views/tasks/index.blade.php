@@ -4,26 +4,17 @@
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Tasks') }}
+                    <span id="last-updated" class="text-sm text-gray-500 font-normal ml-2"></span>
                 </h2>
-                <div class="flex space-x-4 mt-2">
-                    <button id="filter-all" class="filter-btn active px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
-                        All Tasks
-                    </button>
-                    <button id="filter-pending" class="filter-btn px-3 py-1 text-sm font-medium rounded-full bg-orange-100 text-orange-800 border border-orange-200">
-                        Pending
-                    </button>
-                    <button id="filter-completed" class="filter-btn px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
-                        Completed
-                    </button>
-                </div>
             </div>
-            @if(auth()->user()->role == 'admin')
-            <a href="{{ route('tasks.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-lg px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create Task
-            </a>
+            @if (auth()->user()->role == 'admin')
+                <a href="{{ route('tasks.create') }}"
+                    class="bg-blue-600 hover:bg-blue-700 text-white text-lg px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Create Task
+                </a>
             @endif
         </div>
     </x-slot>
@@ -34,9 +25,13 @@
             <div id="refresh-indicator" class="hidden mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
                         </svg>
                         <span class="text-blue-800 font-medium">Checking for new tasks...</span>
                     </div>
@@ -49,81 +44,345 @@
             <!-- Welcome Message -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-800">Welcome, {{ auth()->user()->name }}!</h3>
-                    <p class="text-gray-600 mt-1">
-                        @if (auth()->user()->role == 'admin')
-                            You can create, edit, and assign tasks to users.
-                        @else
-                            Here are the tasks assigned to you.
-                        @endif
-                    </p>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">Welcome, {{ auth()->user()->name }}!</h3>
+                            <p class="text-gray-600 mt-1">
+                                @if (auth()->user()->role == 'admin')
+                                    You can create, edit, and assign tasks to users.
+                                @else
+                                    Here are the tasks assigned to you.
+                                @endif
+                            </p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex space-x-2">
+                            <button id="filter-all" class="filter-btn active px-3 py-2 text-sm font-medium rounded-lg bg-blue-100 text-blue-800 border border-blue-200 transition-colors duration-200">
+                                All Tasks
+                            </button>
+                            <button id="filter-pending" class="filter-btn px-3 py-2 text-sm font-medium rounded-lg bg-orange-100 text-orange-800 border border-orange-200 transition-colors duration-200">
+                                Pending
+                            </button>
+                            <button id="filter-completed" class="filter-btn px-3 py-2 text-sm font-medium rounded-lg bg-green-100 text-green-800 border border-green-200 transition-colors duration-200">
+                                Completed
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Search and Filters -->
+            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <!-- Search -->
+                    <div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <input type="text" id="search-input" placeholder="Search tasks..."
+                                class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                        </div>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div>
+                        <select id="category-filter"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                            <option value="">All Categories</option>
+                            <option value="general">General</option>
+                            <option value="development">Development</option>
+                            <option value="design">Design</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="support">Support</option>
+                        </select>
+                    </div>
+
+                    <!-- Priority Filter -->
+                    <div>
+                        <select id="priority-filter"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                            <option value="">All Priorities</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div>
+                        <select id="status-filter"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Active Filters Display -->
+                <div id="active-filters" class="hidden flex flex-wrap gap-2 mt-2">
+                    <!-- Active filters will appear here -->
+                </div>
+            </div>
+
+            <!-- Tasks Container -->
             <div id="tasks-container">
-                <!-- Tasks content will be loaded here -->
                 @include('tasks.partials.tasks-list', ['tasks' => $tasks])
+            </div>
+
+            <!-- No Results Message -->
+            <div id="no-results" class="hidden text-center py-12">
+                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
+                <p class="text-gray-500">Try adjusting your search or filters</p>
+                <button onclick="clearAllFilters()" class="mt-4 text-blue-600 hover:text-blue-800 font-medium">
+                    Clear all filters
+                </button>
             </div>
         </div>
     </div>
 
     <script>
+        let autoRefreshInterval;
+        let isAutoRefreshEnabled = true;
+        let currentFilters = {
+            search: '',
+            category: '',
+            priority: '',
+            status: '',
+            completion: 'all'
+        };
+
         // Filter functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const filterButtons = document.querySelectorAll('.filter-btn');
+            initializeFilters();
+            startAutoRefresh();
+            addManualRefreshButton();
+        });
 
+        function initializeFilters() {
+            // Status filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
             filterButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    // Remove active class from all buttons
                     filterButtons.forEach(btn => btn.classList.remove('active', 'bg-blue-100', 'text-blue-800', 'border-blue-200'));
-
-                    // Add active class to clicked button
-                    this.classList.add('active');
+                    this.classList.add('active', 'bg-blue-100', 'text-blue-800', 'border-blue-200');
 
                     const filter = this.id.replace('filter-', '');
-                    filterTasks(filter);
+                    currentFilters.completion = filter;
+                    applyFilters();
                 });
             });
 
-            function filterTasks(filter) {
-                const taskItems = document.querySelectorAll('.task-item');
+            // Search input
+            const searchInput = document.getElementById('search-input');
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentFilters.search = this.value.toLowerCase();
+                    applyFilters();
+                }, 300);
+            });
 
-                taskItems.forEach(task => {
-                    const isCompleted = task.classList.contains('completed');
+            // Category filter
+            document.getElementById('category-filter').addEventListener('change', function() {
+                currentFilters.category = this.value;
+                applyFilters();
+            });
 
-                    switch(filter) {
-                        case 'all':
-                            task.style.display = 'block';
-                            break;
-                        case 'pending':
-                            task.style.display = isCompleted ? 'none' : 'block';
-                            break;
-                        case 'completed':
-                            task.style.display = isCompleted ? 'block' : 'none';
-                            break;
-                    }
-                });
+            // Priority filter
+            document.getElementById('priority-filter').addEventListener('change', function() {
+                currentFilters.priority = this.value;
+                applyFilters();
+            });
+
+            // Status filter
+            document.getElementById('status-filter').addEventListener('change', function() {
+                currentFilters.status = this.value;
+                applyFilters();
+            });
+        }
+
+        function applyFilters() {
+            const taskItems = document.querySelectorAll('.task-item');
+            let visibleCount = 0;
+            updateActiveFiltersDisplay();
+
+            taskItems.forEach(task => {
+                const title = task.querySelector('h4').textContent.toLowerCase();
+                const description = task.querySelector('p') ? task.querySelector('p').textContent.toLowerCase() : '';
+                const category = task.dataset.category || 'general';
+                const priority = task.dataset.priority || 'medium';
+                const isCompleted = task.classList.contains('completed');
+                const isOverdue = task.classList.contains('overdue');
+
+                // Apply filters
+                const matchesSearch = !currentFilters.search ||
+                    title.includes(currentFilters.search) ||
+                    description.includes(currentFilters.search);
+
+                const matchesCategory = !currentFilters.category || category === currentFilters.category;
+                const matchesPriority = !currentFilters.priority || priority === currentFilters.priority;
+
+                let matchesStatus = true;
+                if (currentFilters.status === 'completed') {
+                    matchesStatus = isCompleted;
+                } else if (currentFilters.status === 'pending') {
+                    matchesStatus = !isCompleted;
+                } else if (currentFilters.status === 'overdue') {
+                    matchesStatus = isOverdue;
+                }
+
+                let matchesCompletion = true;
+                if (currentFilters.completion === 'pending') {
+                    matchesCompletion = !isCompleted;
+                } else if (currentFilters.completion === 'completed') {
+                    matchesCompletion = isCompleted;
+                }
+
+                const shouldShow = matchesSearch && matchesCategory && matchesPriority && matchesStatus && matchesCompletion;
+                task.style.display = shouldShow ? 'block' : 'none';
+
+                if (shouldShow) visibleCount++;
+            });
+
+            // Show/hide no results message
+            const noResults = document.getElementById('no-results');
+            const tasksContainer = document.getElementById('tasks-container');
+
+            if (visibleCount === 0 && hasActiveFilters()) {
+                noResults.classList.remove('hidden');
+                tasksContainer.classList.add('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                tasksContainer.classList.remove('hidden');
             }
-        });
-    </script>
+        }
 
-    <script>
-        let autoRefreshInterval;
-        let isAutoRefreshEnabled = true;
+        function updateActiveFiltersDisplay() {
+            const activeFiltersContainer = document.getElementById('active-filters');
+            activeFiltersContainer.innerHTML = '';
 
+            const filters = [];
+
+            if (currentFilters.search) {
+                filters.push(`Search: "${currentFilters.search}"`);
+            }
+            if (currentFilters.category) {
+                filters.push(`Category: ${currentFilters.category}`);
+            }
+            if (currentFilters.priority) {
+                filters.push(`Priority: ${currentFilters.priority}`);
+            }
+            if (currentFilters.status) {
+                filters.push(`Status: ${currentFilters.status}`);
+            }
+            if (currentFilters.completion && currentFilters.completion !== 'all') {
+                filters.push(`${currentFilters.completion.charAt(0).toUpperCase() + currentFilters.completion.slice(1)}`);
+            }
+
+            if (filters.length > 0) {
+                activeFiltersContainer.classList.remove('hidden');
+                filters.forEach(filter => {
+                    const badge = document.createElement('span');
+                    badge.className = 'px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center';
+                    badge.innerHTML = `
+                        ${filter}
+                        <button onclick="removeFilter('${filter.split(':')[0].trim().toLowerCase()}')" class="ml-2 text-blue-600 hover:text-blue-800">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    `;
+                    activeFiltersContainer.appendChild(badge);
+                });
+            } else {
+                activeFiltersContainer.classList.add('hidden');
+            }
+        }
+
+        function removeFilter(filterType) {
+            switch(filterType) {
+                case 'search':
+                    currentFilters.search = '';
+                    document.getElementById('search-input').value = '';
+                    break;
+                case 'category':
+                    currentFilters.category = '';
+                    document.getElementById('category-filter').value = '';
+                    break;
+                case 'priority':
+                    currentFilters.priority = '';
+                    document.getElementById('priority-filter').value = '';
+                    break;
+                case 'status':
+                    currentFilters.status = '';
+                    document.getElementById('status-filter').value = '';
+                    break;
+                case 'all':
+                case 'pending':
+                case 'completed':
+                    currentFilters.completion = 'all';
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        if (btn.id === 'filter-all') {
+                            btn.classList.add('active', 'bg-blue-100', 'text-blue-800', 'border-blue-200');
+                        } else {
+                            btn.classList.remove('active', 'bg-blue-100', 'text-blue-800', 'border-blue-200');
+                        }
+                    });
+                    break;
+            }
+            applyFilters();
+        }
+
+        function clearAllFilters() {
+            currentFilters = {
+                search: '',
+                category: '',
+                priority: '',
+                status: '',
+                completion: 'all'
+            };
+
+            document.getElementById('search-input').value = '';
+            document.getElementById('category-filter').value = '';
+            document.getElementById('priority-filter').value = '';
+            document.getElementById('status-filter').value = '';
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.id === 'filter-all') {
+                    btn.classList.add('active', 'bg-blue-100', 'text-blue-800', 'border-blue-200');
+                } else {
+                    btn.classList.remove('active', 'bg-blue-100', 'text-blue-800', 'border-blue-200');
+                }
+            });
+
+            applyFilters();
+        }
+
+        function hasActiveFilters() {
+            return currentFilters.search || currentFilters.category || currentFilters.priority ||
+                   currentFilters.status || (currentFilters.completion && currentFilters.completion !== 'all');
+        }
+
+        // Auto-refresh functionality
         function startAutoRefresh() {
-            // Refresh every 60 seconds
             autoRefreshInterval = setInterval(() => {
                 if (isAutoRefreshEnabled) {
                     refreshTasks();
                 }
-            }, 60000); // 60 seconds
-
+            }, 60000);
             updateLastUpdatedTime();
         }
 
         function refreshTasks() {
-            // Show refresh indicator
             const indicator = document.getElementById('refresh-indicator');
             indicator.classList.remove('hidden');
 
@@ -135,17 +394,12 @@
             })
             .then(response => response.text())
             .then(html => {
-                // Update tasks container
                 document.getElementById('tasks-container').innerHTML = html;
-
-                // Hide refresh indicator
                 indicator.classList.add('hidden');
-
-                // Update last updated time
                 updateLastUpdatedTime();
-
-                // Show update notification
                 showUpdateNotification('Tasks updated successfully');
+                // Re-apply filters after refresh
+                applyFilters();
             })
             .catch(error => {
                 console.error('Error refreshing tasks:', error);
@@ -173,7 +427,6 @@
         }
 
         function showUpdateNotification(message) {
-            // Create or update notification
             let notification = document.getElementById('update-notification');
             if (!notification) {
                 notification = document.createElement('div');
@@ -185,22 +438,16 @@
             notification.textContent = message;
             notification.classList.remove('translate-x-full');
 
-            // Hide after 3 seconds
             setTimeout(() => {
                 notification.classList.add('translate-x-full');
             }, 3000);
         }
 
-        // Manual refresh function
         function manualRefresh() {
             refreshTasks();
         }
 
-        // Start auto-refresh when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            startAutoRefresh();
-
-            // Add manual refresh button if not exists
+        function addManualRefreshButton() {
             if (!document.getElementById('manual-refresh-btn')) {
                 const header = document.querySelector('h2.font-semibold');
                 const refreshBtn = document.createElement('button');
@@ -215,9 +462,8 @@
                 refreshBtn.onclick = manualRefresh;
                 header.appendChild(refreshBtn);
             }
-        });
+        }
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', function() {
             clearInterval(autoRefreshInterval);
         });
