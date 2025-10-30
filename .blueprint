@@ -1,3 +1,17 @@
 models:
-    Task: { title: string, description: 'text nullable', user_id: biginteger }
-    User: { name: string, email: string, email_verified_at: 'timestamp nullable', password: string, remember_token: 'string:100 nullable', role: "string default:'user'::character varying" }
+    Task:
+        {
+            title: string,
+            description: "text nullable",
+            user_id: biginteger,
+            completed: "boolean default:false",
+        }
+    User:
+        {
+            name: string,
+            email: string,
+            email_verified_at: "timestamp nullable",
+            password: string,
+            remember_token: "string:100 nullable",
+            role: "string default:'user'::character varying",
+        }

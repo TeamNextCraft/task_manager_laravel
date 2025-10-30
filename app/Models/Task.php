@@ -13,11 +13,17 @@ class Task extends Model
         'title',
         'description',
         'user_id',
-        'completed', // Make sure this field exists in your database
+        'completed',
+        'category',
+        'priority',
+        'due_date',
+        'completed_at'
     ];
 
     protected $casts = [
         'completed' => 'boolean',
+        'due_date' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     /**
@@ -44,5 +50,22 @@ class Task extends Model
     public function scopePending($query)
     {
         return $query->where('completed', false);
+    }
+
+    public function scopeHighPriority($query)
+    {
+        return $query->whereIn('priority', ['high', 'urgent']);
+    }
+
+    public function isOverdue()
+    {
+        return $this->due_date && $this->due_date->isPast() && !$this->completed;
+    }
+
+    public function getStatusAttribute()
+    {
+        if ($this->completed) return 'completed';
+        if ($this->isOverdue()) return 'overdue';
+        return 'pending';
     }
 }

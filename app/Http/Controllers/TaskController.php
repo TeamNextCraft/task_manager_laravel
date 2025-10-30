@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Notifications\TaskAssignedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,9 +48,15 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'user_id' => 'required|exists:users,id',
+            'category' => 'nullable|string|in:general,development,design,marketing,support,research,documentation,testing',
+            'priority' => 'nullable|in:low,medium,high,urgent',
+            'due_date' => 'nullable|date|after:now',
         ]);
 
-        Task::create($request->all());
+        $task = Task::create($request->all());
+
+        // Send notification to assigned user
+        $task->user->notify(new TaskAssignedNotification($task));
 
         return redirect()->route('tasks.index')
             ->with('success', 'Task created successfully.');
@@ -73,6 +80,10 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'user_id' => 'required|exists:users,id',
+            'category' => 'nullable|string|in:general,development,design,marketing,support,research,documentation,testing',
+            'priority' => 'nullable|in:low,medium,high,urgent',
+            'due_date' => 'nullable|date|after:now',
+            'completed' => 'boolean',
         ]);
 
         $task->update($request->all());
