@@ -1,10 +1,15 @@
 models:
+    Comment: { task_id: biginteger, user_id: biginteger, content: text }
     Task:
         {
             title: string,
             description: "text nullable",
             user_id: biginteger,
             completed: "boolean default:false",
+            category: "string default:'general'::character varying",
+            priority: "string default:'medium'::character varying",
+            due_date: "timestamp nullable",
+            completed_at: "timestamp nullable",
         }
     User:
         {
